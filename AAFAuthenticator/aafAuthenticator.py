@@ -45,6 +45,8 @@ class AAFAuthenticator(Authenticator):
     authenticate (method takes one arg - the request handler handling the oauth callback)
     """
 
+    auto_login = False
+
     external_login_url = Unicode(
         os.getenv('AAF_LOGIN_LINK', ''),
         config=True,
