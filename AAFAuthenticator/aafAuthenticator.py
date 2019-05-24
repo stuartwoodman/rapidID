@@ -19,9 +19,14 @@ class AAFLoginHandler(BaseHandler):
     """Base class for login handler
     """
     def get(self):
-        external_login_url = self.authenticator.get_external_login_url(self)
-        self.log.info('AAF redirect: %r', external_login_url)
-        self.redirect(external_login_url)
+        user = self.current_user
+        if user:
+            self.set_login_cookie(user)
+            self.redirect(self.get_next_url(user), permanent=False)
+        else:
+            external_login_url = self.authenticator.get_external_login_url(self)
+            self.log.info('AAF redirect: %r', external_login_url)
+            self.redirect(external_login_url)
 
 
 class AAFCallbackHandler(BaseHandler):
@@ -44,8 +49,6 @@ class AAFAuthenticator(Authenticator):
     login_handler
     authenticate (method takes one arg - the request handler handling the oauth callback)
     """
-
-    auto_login = False
 
     external_login_url = Unicode(
         os.getenv('AAF_LOGIN_LINK', ''),
